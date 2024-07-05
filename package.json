@@ -1,0 +1,24 @@
+{
+  "name": "@diffusionstudio/piper-wasm",
+  "version": "1.0.0",
+  "description": "Wasm build of rhasspy / piper",
+  "main": "/build/piper_phonemize.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/diffusion-studio/piper-wasm.git"
+  },
+  "keywords": [
+    "wasm",
+    "piper",
+    "tts"
+  ],
+  "author": "Konstantin Paulus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/diffusion-studio/piper-wasm/issues"
+  },
+  "homepage": "https://github.com/diffusion-studio/piper-wasm#readme"
+}
