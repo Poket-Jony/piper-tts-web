@@ -2,7 +2,71 @@
 
 The files in `/build` were generated using the steps proposed by [wide-video / piper-wasm](https://github.com/wide-video/piper-wasm).
 
+## Usage
+
+To use PiperTTS client-side in your project, you need to copy some of the neccessary files into your public directory. If you're using NextJS, you need to install the `copy-webpack-plugin` as a dev dependency and modify your config something like this:
+
+```json
+const nextConfig = {
+  webpack: (config) => {
+    config.plugins.push(
+      new CopyPlugin({
+        patterns: [
+          {
+            from: "node_modules/@diffusionstudio/piper-wasm/build/piper_phonemize.wasm",
+            to: "../public/",
+          },
+          {
+            from: "node_modules/@diffusionstudio/piper-wasm/build/piper_phonemize.data",
+            to: "../public/",
+          },
+          {
+            from: "node_modules/@diffusionstudio/piper-wasm/build/piper_phonemize.js",
+            to: "../public/",
+          },
+          {
+            from: "node_modules/@diffusionstudio/piper-wasm/piper_worker.js",
+            to: "../public/",
+          },
+          {
+            from: "node_modules/@diffusionstudio/piper-wasm/espeak-ng/espeak-ng-data/voices",
+            to: "../public/espeak-ng-data/voices",
+          },
+          {
+            from: "node_modules/@diffusionstudio/piper-wasm/espeak-ng/espeak-ng-data/lang",
+            to: "../public/espeak-ng-data/lang",
+          },
+        ],
+      })
+    );
+    return config;
+  },
+  ...
+};
+```
+
+To generate audio, you can use the `piperGenerate` function:
+
+```js
+/**
+ * Generates audio using the Piper model.
+ *
+ * @param {string} piperPhonemizeJsUrl - URL for the Piper phonemize JavaScript file.
+ * @param {string} piperPhonemizeWasmUrl - URL for the Piper phonemize WASM file.
+ * @param {string} piperPhonemizeDataUrl - URL for the Piper phonemize data file.
+ * @param {string} workerUrl - URL for the Web Worker script.
+ * @param {string} modelUrl - URL for the model file.
+ * @param {string} modelConfigUrl - URL for the model configuration file.
+ * @param {number} speakerId - ID of the speaker.
+ * @param {string} input - Text input to be processed.
+ * @param {function(number): void} onProgress - Callback function to handle progress updates.
+ *
+ * @returns {Promise<string>} A promise that resolves with the generated audio Blob URL.
+ */
+```
+
 **As of JUN 2024:**
+
 ```sh
 # Docker (optional)
 docker run -it -v $(pwd):/wasm -w /wasm debian:11.3
