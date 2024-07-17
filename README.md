@@ -6,7 +6,7 @@ The files in `/build` were generated using the steps proposed by [wide-video / p
 
 To use PiperTTS client-side in your project, you need to copy some of the neccessary files into your public directory. If you're using NextJS, you need to install the `copy-webpack-plugin` as a dev dependency and modify your config something like this:
 
-```json
+```js
 const nextConfig = {
   webpack: (config) => {
     config.plugins.push(
