@@ -4,7 +4,7 @@ The files in `/build` were generated using the steps proposed by [wide-video / p
 
 ## Usage
 
-To use PiperTTS client-side in your project, you need to copy some of the neccessary files into your public directory. If you're using NextJS, you need to install the `copy-webpack-plugin` as a dev dependency and modify your config something like this:
+To use PiperTTS client-side in your project, copy the neccessary files into your public directory. If you're using Webpack and/or NextJS, you need to install the `copy-webpack-plugin` as a dev dependency and modify your config like this:
 
 ```js
 const nextConfig = {
@@ -43,6 +43,24 @@ const nextConfig = {
   },
   ...
 };
+```
+
+Make sure that all files and directories listed share the same parent route:
+
+```txt
+- some-route
+  - piper_phonemize.wasm
+  - piper_phonemize.data
+  - piper_phonemize.js
+  - piper_worker.js
+  - espeak-ng-data
+    - voices
+    - lang
+```
+
+Then, you can import the `piperPhonemize` function:
+
+```js
 ```
 
 To generate audio, you can use the `piperGenerate` function:
