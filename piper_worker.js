@@ -1,6 +1,7 @@
 self.addEventListener("message", (event) => {
   const data = event.data;
   if (data.kind === "init") init(data);
+  if (data.kind === "phonemize") init(data, true);
 });
 
 const getBlob = async (url, blobs) =>
@@ -38,7 +39,23 @@ const getBlob = async (url, blobs) =>
     xhr.send();
   });
 
-async function init(data) {
+/**
+ * Initializes the Piper phonemizer and generates audio output.
+ *
+ * @param {Object} data - The data required for initialization and processing.
+ * @param {string} data.input - The text input to be phonemized and converted to speech.
+ * @param {number} data.speakerId - The ID of the speaker to be used for synthesis.
+ * @param {Object} data.blobs - A dictionary of pre-fetched blobs.
+ * @param {string} data.modelUrl - The URL of the model file.
+ * @param {string} data.modelConfigUrl - The URL of the model configuration file.
+ * @param {string} data.piperPhonemizeJsUrl - The URL of the Piper phonemize JavaScript file.
+ * @param {string} data.piperPhonemizeWasmUrl - The URL of the Piper phonemize WASM file.
+ * @param {string} data.piperPhonemizeDataUrl - The URL of the Piper phonemize data file.
+ * @param {boolean?} phonemizeOnly - Flag indicating if only phonemization is required.
+ *
+ * @returns {Promise<void>} A promise that resolves when the initialization and processing is complete.
+ */
+async function init(data, phonemizeOnly = false) {
   const { input, speakerId, blobs, modelUrl, modelConfigUrl } = data;
   const onnxruntimeBase =
     "https://cdnjs.cloudflare.com/ajax/libs/onnxruntime-web/1.17.1/";
@@ -87,6 +104,17 @@ async function init(data) {
       "/espeak-ng-data",
     ]);
   });
+
+  if (phonemizeOnly) {
+    const phonemeIdMap = Object.entries(modelConfig.phoneme_id_map);
+    const idPhonemeMap = Object.fromEntries(
+      phonemeIdMap.map(([k, v]) => [v[0], k])
+    );
+    const phonemes = phonemeIds.map((id) => idPhonemeMap[id]);
+    self.postMessage({ kind: "output", input, phonemes, phonemeIds });
+    self.postMessage({ kind: "complete" });
+    return;
+  }
 
   const sampleRate = modelConfig.audio.sample_rate;
   const numChannels = 1;
