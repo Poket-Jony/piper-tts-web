@@ -4,7 +4,7 @@ The files in `/build` were generated using the steps proposed by [wide-video / p
 
 ## Usage
 
-To use PiperTTS client-side in your project, copy the neccessary files into your public directory. If you're using Webpack and/or NextJS, you need to install the `copy-webpack-plugin` as a dev dependency and modify your config like this:
+To use PiperTTS client-side in your project, copy the neccessary files into your public directory. If you're using Webpack and NextJS, you need to install the `copy-webpack-plugin` as a dev dependency and modify your config like this:
 
 ```js
 const nextConfig = {
@@ -13,28 +13,38 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
-            from: "node_modules/@diffusionstudio/piper-wasm/build/piper_phonemize.wasm",
+            from: "node_modules/piper-wasm/build/piper_phonemize.wasm",
             to: "../public/",
           },
           {
-            from: "node_modules/@diffusionstudio/piper-wasm/build/piper_phonemize.data",
+            from: "node_modules/piper-wasm/build/piper_phonemize.data",
             to: "../public/",
           },
           {
-            from: "node_modules/@diffusionstudio/piper-wasm/build/piper_phonemize.js",
+            from: "node_modules/piper-wasm/build/piper_phonemize.js",
             to: "../public/",
           },
           {
-            from: "node_modules/@diffusionstudio/piper-wasm/piper_worker.js",
+            from: "node_modules/piper-wasm/build/worker/piper_worker.js",
             to: "../public/",
           },
           {
-            from: "node_modules/@diffusionstudio/piper-wasm/espeak-ng/espeak-ng-data/voices",
+            from: "node_modules/piper-wasm/espeak-ng/espeak-ng-data/voices",
             to: "../public/espeak-ng-data/voices",
           },
           {
-            from: "node_modules/@diffusionstudio/piper-wasm/espeak-ng/espeak-ng-data/lang",
+            from: "node_modules/piper-wasm/espeak-ng/espeak-ng-data/lang",
             to: "../public/espeak-ng-data/lang",
+          },
+          // onnx runtime stuff
+          {
+            from: "node_modules/piper-wasm/build/worker/dist",
+            to: "../public/dist",
+          },
+          // only needed if you need to know the emotion of the speaker
+          {
+            from: "node_modules/piper-wasm/build/worker/expression_worker.js",
+            to: "../public/",
           },
         ],
       })
@@ -45,9 +55,11 @@ const nextConfig = {
 };
 ```
 
+Other build tools may require different configurations, so check which one you're using and figure out how to copy files to your public directory if you don't know how to do it.
+
 Make sure that all files and directories listed share the same parent route:
 
-```txt
+```yml
 - some-route
   - piper_phonemize.wasm
   - piper_phonemize.data
@@ -56,34 +68,89 @@ Make sure that all files and directories listed share the same parent route:
   - espeak-ng-data
     - voices
     - lang
+  - expression_worker.js  # optional
+  - dist
+    - {onnx-runtime-stuff}
 ```
 
-Then, you can import the `piperPhonemize` function:
+Then, you can import the `piperGenerate` function to generate audio. If you want to use the models hosted in the Rhasppy HuggingFace repository, you can also import `HF_BASE`, which is the base URL for the models, and append the model path. Here's an example of how to generate audio:
 
 ```js
+import { piperGenerate } from "piper-wasm";
+
+const data = await piperGenerate(
+  "piper_phonemize.js",
+  "piper_phonemize.wasm",
+  "piper_phonemize.data",
+  "piper_worker.js",
+  `${HF_BASE}en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx`,
+  `${HF_BASE}en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx.json`,
+  307,
+  text,
+  (progress) => { },
+  null,
+  false
+);
 ```
 
-To generate audio, you can use the `piperGenerate` function:
+`data` gives you the Blob URL of the generated audio, along with some other information. You can use this URL to play the audio in your application like so:
 
 ```js
-/**
- * Generates audio using the Piper model.
- *
- * @param {string} piperPhonemizeJsUrl - URL for the Piper phonemize JavaScript file.
- * @param {string} piperPhonemizeWasmUrl - URL for the Piper phonemize WASM file.
- * @param {string} piperPhonemizeDataUrl - URL for the Piper phonemize data file.
- * @param {string} workerUrl - URL for the Web Worker script.
- * @param {string} modelUrl - URL for the model file.
- * @param {string} modelConfigUrl - URL for the model configuration file.
- * @param {number} speakerId - ID of the speaker.
- * @param {string} input - Text input to be processed.
- * @param {function(number): void} onProgress - Callback function to handle progress updates.
- *
- * @returns {Promise<string>} A promise that resolves with the generated audio Blob URL.
- */
+const audio = new Audio(data.file);
+audio.play();
 ```
 
-**As of JUN 2024:**
+If you only need the phonemes, you can use the `piperPhonemize` function instead:
+
+```js
+const { phonemes, phonemeIds } = await piperPhonemize(
+  "piper_phonemize.js",
+  "piper_phonemize.wasm",
+  "piper_phonemize.data",
+  "piper_worker.js",
+  `${HF_BASE}en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx`,
+  text,
+  (progress) => {},
+);
+```
+
+Read the JSDoc comments for the functions for more info.
+
+## NextJS config
+
+One opt-in feature of this package is emotion inference from audio. It uses the transformers.js library for that, which doesn't play nicely with NextJS out of the box.
+If you've gotten this far, you're probably seeing an error message like this:
+
+```txt
+Module parse failed: Unexpected character '�' (1:0)
+You may need an appropriate loader to handle this file type, ...
+```
+
+To resolve this issue, you need to add a custom webpack configuration to your NextJS project. Here's how you can do it:
+
+```js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    // (Optional) Export as a static site
+    // See https://nextjs.org/docs/pages/building-your-application/deploying/static-exports#configuration
+    output: 'export', // Feel free to modify/remove this option
+
+    // Override the default webpack configuration
+    webpack: (config) => {
+        // See https://webpack.js.org/configuration/resolve/#resolvealias
+        config.resolve.alias = {
+            ...config.resolve.alias,
+            "sharp$": false,
+            "onnxruntime-node$": false,
+        }
+        return config;
+    },
+}
+```
+
+This config step is taken straight from the [transformers.js documentation](https://huggingface.co/docs/transformers.js/tutorials/next). If you're still having trouble or need more information, check out that documentation.
+
+**Piper Phonemize Build Steps As of JUN 2024:**
 
 ```sh
 # Docker (optional)

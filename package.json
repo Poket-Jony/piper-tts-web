@@ -1,24 +1,46 @@
 {
-  "name": "@diffusionstudio/piper-wasm",
-  "version": "1.0.0",
-  "description": "Wasm build of rhasspy / piper",
-  "main": "/build/piper_phonemize.js",
+  "name": "piper-wasm",
+  "version": "0.1.1",
+  "description": "Wasm Version of rhasspy / piper running locally in the browser",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "bun run build-worker-expression && bun run build-worker-piper && bun run copy-transformers-dist",
+    "build-worker-expression": "bun build expression_worker.js --outdir build/worker",
+    "build-worker-piper": "bun build piper_worker.js --outdir build/worker",
+    "copy-transformers-dist": "cp -r node_modules/@xenova/transformers/dist build/worker/dist"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/diffusion-studio/piper-wasm.git"
+    "url": "git+https://github.com/DavidCks/piper-wasm.git"
   },
+  "files": [
+    "build",
+    "espeak-ng/espeak-ng-data/lang",
+    "espeak-ng/espeak-ng-data/voices",
+    "index.js",
+    "api.js",
+    "piper_worker.js"
+  ],
   "keywords": [
     "wasm",
     "piper",
     "tts"
   ],
-  "author": "Konstantin Paulus",
+  "author": "DavidCks",
+  "contributors": [
+    {
+      "name": "Konstantin Paulus",
+      "url": "https://github.com/diffusion-studio"
+    }
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/diffusion-studio/piper-wasm/issues"
+    "url": "https://github.com/DavidCks/piper-wasm/issues"
   },
-  "homepage": "https://github.com/diffusion-studio/piper-wasm#readme"
+  "homepage": "https://davidcks.onrender.com/",
+  "dependencies": {
+    "@xenova/transformers": "^2.17.2",
+    "@davidcks/transformers": "../transformers"
+  }
 }
