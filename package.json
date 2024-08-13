@@ -8,7 +8,7 @@
     "build": "bun run build-worker-expression && bun run build-worker-piper && bun run copy-transformers-dist",
     "build-worker-expression": "bun build expression_worker.js --outdir build/worker",
     "build-worker-piper": "bun build piper_worker.js --outdir build/worker",
-    "copy-transformers-dist": "cp -r node_modules/@xenova/transformers/dist build/worker/dist"
+    "copy-transformers-dist": "rm -rf build/worker/dist && cp -r node_modules/@xenova/transformers/dist build/worker/dist"
   },
   "repository": {
     "type": "git",
