@@ -25670,8 +25670,8 @@ var TASK_ALIASES = Object.freeze({
 env.allowLocalModels = false;
 
 class TextExpressionInferencePipeline {
-  static task = "sentiment-analysis";
-  static model = "Xenova/twitter-roberta-base-sentiment-latest";
+  static task = "text-classification";
+  static model = "Cohee/distilbert-base-uncased-go-emotions-onnx";
   static instance = null;
   static async getInstance(progress_callback = null) {
     if (this.instance === null) {

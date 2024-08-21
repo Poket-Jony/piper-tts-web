@@ -5,8 +5,8 @@ import { getBlob } from "./worker_blob_cache";
 env.allowLocalModels = false;
 
 class TextExpressionInferencePipeline {
-  static task = "sentiment-analysis";
-  static model = "Xenova/twitter-roberta-base-sentiment-latest";
+  static task = "text-classification";
+  static model = "Cohee/distilbert-base-uncased-go-emotions-onnx";
   // static testModel = "Xenova/mobilebert-uncased-mnli";
   static instance = null;
 

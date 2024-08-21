@@ -131,12 +131,22 @@ class FaceExpression {
    * @param {number} params.sad - The "sad" property of the expression.
    * @param {number} params.surprised - The "surprised" property of the expression.
    * @param {number} params.neutral - The "neutral" property of the expression.
+   * @param {string} params.emotion - The emotion to express.
    *
    * All values default to 0 if not provided.
    *
    * @returns {FaceExpression} The new FaceExpression.
    */
-  constructor({ duration, angry, happy, relaxed, sad, surprised, neutral }) {
+  constructor({
+    duration,
+    angry,
+    happy,
+    relaxed,
+    sad,
+    surprised,
+    neutral,
+    emotion,
+  }) {
     this.duration = duration ?? 0;
     this.angry = angry ?? 0;
     this.happy = happy ?? 0;
@@ -144,6 +154,130 @@ class FaceExpression {
     this.sad = sad ?? 0;
     this.surprised = surprised ?? 0;
     this.neutral = neutral ?? 0;
+    this.emotion = emotion ?? "";
+  }
+
+  static fromDistilbertGoEmotions(sentiment, duration = -1) {
+    const expression = new FaceExpression({ duration: duration });
+    const labelAppliers = {
+      admiration: (expression) => {
+        expression.relaxed = sentiment.score;
+        expression.surprised = sentiment.score;
+      },
+      amusement: (expression) => {
+        expression.happy = sentiment.score;
+        expression.surprised = sentiment.score * 0.2;
+      },
+      anger: (expression) => {
+        expression.angry = sentiment.score;
+      },
+      annoyance: (expression) => {
+        expression.angry = sentiment.score * 0.8;
+        expression.sad = sentiment.score * 0.2;
+      },
+      approval: (expression) => {
+        expression.relaxed = sentiment.score;
+      },
+      caring: (expression) => {
+        expression.relaxed = sentiment.score;
+        expression.sad = sentiment.score * 0.5;
+        expression.happy = sentiment.score * 0.1;
+      },
+      confusion: (expression) => {
+        expression.angry = sentiment.score * 0.5;
+        expression.surprised = sentiment.score * 0.4;
+        expression.sad = sentiment.score * 0.1;
+      },
+      curiosity: (expression) => {
+        expression.happy = sentiment.score * 0.5;
+        expression.surprised = sentiment.score * 0.6;
+      },
+      desire: (expression) => {
+        expression.relaxed = sentiment.score;
+        expression.angry = sentiment.score * 0.5;
+      },
+      disappointment: (expression) => {
+        expression.sad = sentiment.score * 0.7;
+        expression.angry = sentiment.score * 0.7;
+      },
+      disapproval: (expression) => {
+        expression.angry = sentiment.score;
+        expression.relaxed = sentiment.score * 0.5;
+      },
+      disgust: (expression) => {
+        expression.angry = sentiment.score;
+        expression.relaxed = sentiment.score * 0.7;
+      },
+      embarrassment: (expression) => {
+        expression.sad = sentiment.score;
+        expression.relaxed = sentiment.score * 0.15;
+      },
+      excitement: (expression) => {
+        expression.happy = sentiment.score * 0.9;
+        expression.surprised = sentiment.score * 0.9;
+      },
+      fear: (expression) => {
+        expression.sad = sentiment.score;
+        expression.surprised = sentiment.score * 0.8;
+      },
+      gratitude: (expression) => {
+        expression.happy = sentiment.score;
+        expression.relaxed = sentiment.score * 0.5;
+      },
+      grief: (expression) => {
+        expression.sad = sentiment.score;
+        expression.anger = sentiment.score * 0.5;
+      },
+      joy: (expression) => {
+        expression.happy = sentiment.score;
+      },
+      love: (expression) => {
+        expression.happy = sentiment.score * 0.5;
+        expression.relaxed = sentiment.score * 0.5;
+        expression.sad = sentiment.score * 0.2;
+      },
+      nervousness: (expression) => {
+        expression.sad = sentiment.score;
+        expression.angry = sentiment.score * 0.3;
+        expression.surprised = sentiment.score * 0.5;
+      },
+      optimism: (expression) => {
+        expression.happy = sentiment.score;
+        expression.relaxed = sentiment.score * 0.3;
+      },
+      pride: (expression) => {
+        expression.happy = sentiment.score * 0.2;
+        expression.angry = sentiment.score * 0.3;
+        expression.relaxed = sentiment.score;
+      },
+      realization: (expression) => {
+        expression.happy = sentiment.score * 0.2;
+        expression.surprised = sentiment.score;
+      },
+      relief: (expression) => {
+        expression.relaxed = sentiment.score;
+      },
+      remorse: (expression) => {
+        expression.sad = sentiment.score;
+        expression.angry = sentiment.score * 0.15;
+      },
+      sadness: (expression) => {
+        expression.sad = sentiment.score;
+      },
+      surprise: (expression) => {
+        expression.surprised = sentiment.score;
+      },
+      neutral: (expression) => {
+        expression.neutral = sentiment.score;
+      },
+    };
+    const label = sentiment.label.toLowerCase();
+    if (label in labelAppliers) {
+      labelAppliers[label](expression);
+    } else {
+      expression.neutral = sentiment.score;
+    }
+    return expression;
   }
 
   static fromTwitterRobertaSentiment(sentiment, duration = -1) {
@@ -285,7 +419,7 @@ export class Expressions {
         if (data.status === "output") {
           const output = data.output[0];
           const faceExpressions = [
-            FaceExpression.fromTwitterRobertaSentiment(output, duration),
+            FaceExpression.fromDistilbertGoEmotions(output, duration),
           ];
           resolve(faceExpressions);
           this.expressionWorker.removeEventListener("message", messageListener);

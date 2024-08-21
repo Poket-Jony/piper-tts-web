@@ -130,8 +130,8 @@ export const piperGenerate = async (
           if (event.data.kind === "isAlive") {
             const { isAlive } = event.data;
             if (isAlive) {
-              worker.removeEventListener("message", aliveChecker);
               resolve(true);
+              worker.removeEventListener("message", aliveChecker);
             } else {
               worker.terminate();
               worker = new Worker(workerUrl);
@@ -204,7 +204,7 @@ export const piperGenerate = async (
   if (expressionData) {
     expressionData[0].duration = piperData.duration;
   }
-  piperData.expressions.faceExpressions = expressionData[0];
+  piperData.expressions.faceExpressions = expressionData;
   return piperData;
 };
 

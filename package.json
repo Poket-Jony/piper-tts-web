@@ -1,7 +1,7 @@
 {
   "name": "piper-wasm",
-  "version": "0.1.1",
-  "description": "Wasm Version of rhasspy / piper running locally in the browser",
+  "version": "0.1.2",
+  "description": "Wasm Version of rhasspy/piper running locally in the browser",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -25,7 +25,8 @@
   "keywords": [
     "wasm",
     "piper",
-    "tts"
+    "tts",
+    "onnx"
   ],
   "author": "DavidCks",
   "contributors": [
