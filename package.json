@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "bun run build-worker-expression && bun run build-worker-piper && bun run copy-transformers-dist",
+    "build": "bun run build-worker-expression && bun run build-worker-piper && bun run copy-transformers-dist && bun run copy-onnx-1_17_0-dist",
     "build-worker-expression": "bun build expression_worker.js --outdir build/worker",
     "build-worker-piper": "bun build piper_worker.js --outdir build/worker",
-    "copy-transformers-dist": "rm -rf build/worker/dist && cp -r node_modules/@xenova/transformers/dist build/worker/dist"
+    "copy-transformers-dist": "rm -rf build/worker/dist && mkdir -p build/worker/dist && cp -r node_modules/@xenova/transformers/dist/* build/worker/dist && cp -r node_modules/onnxruntime-web/dist/* build/worker/dist",
+    "copy-onnx-1_17_0-dist": "rm -rf build/worker/dist/piper-dist && mkdir -p build/worker/dist/piper-dist && cp -r node_modules/onnxruntime-web@1.17.0/dist/* build/worker/dist/piper-dist"
   },
   "repository": {
     "type": "git",
@@ -41,7 +42,7 @@
   },
   "homepage": "https://davidcks.onrender.com/",
   "dependencies": {
-    "@xenova/transformers": "^2.17.2",
-    "@davidcks/transformers": "../transformers"
+    "onnxruntime-web@1.17.0": "npm:onnxruntime-web@1.17.0",
+    "@davidcks/transformers": "git+https://github.com/DavidCks/transformers.js.git#main"
   }
 }

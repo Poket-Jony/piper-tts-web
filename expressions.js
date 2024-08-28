@@ -1,5 +1,3 @@
-import { pipeline } from "@xenova/transformers";
-
 /**
  * Duration of a pause in milliseconds.
  * @constant {number}
@@ -277,6 +275,7 @@ class FaceExpression {
     } else {
       expression.neutral = sentiment.score;
     }
+    expression.emotion = label;
     return expression;
   }
 

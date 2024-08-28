@@ -452,7 +452,7 @@ var require_url = __commonJS((exports, module) => {
   var gt = { parse: A, resolve: H, resolveObject: Q, format: k, Url: m, pathToFileURL: J, fileURLToPath: K, URL: D, URLSearchParams: X };
 });
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/node_modules/onnxruntime-common/dist/ort-common.node.js
+// node_modules/onnxruntime-web/node_modules/onnxruntime-common/dist/ort-common.node.js
 var require_ort_common_node = __commonJS((exports) => {
   /*!
    * ONNX Runtime Common v1.14.0
@@ -841,7 +841,7 @@ var require_ort_common_node = __commonJS((exports) => {
   })();
 });
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/node_modules/onnxruntime-web/dist/ort-web.min.js
+// node_modules/onnxruntime-web/dist/ort-web.min.js
 var require_ort_web_min = __commonJS((exports, module) => {
   /*!
   * ONNX Runtime Web v1.14.0
@@ -13457,7 +13457,7 @@ var require_ort_web_min = __commonJS((exports, module) => {
   })());
 });
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/core.js
+// node_modules/@davidcks/transformers/src/utils/core.js
 function dispatchCallback(progress_callback, data) {
   if (progress_callback)
     progress_callback(data);
@@ -13518,16 +13518,16 @@ var Callable = class {
   }
 };
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/hub.js
+// node_modules/@davidcks/transformers/src/utils/hub.js
 var import_path2 = __toESM(require_path(), 1);
 var { default: fs2} = (() => ({}));
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/env.js
+// node_modules/@davidcks/transformers/src/env.js
 var import_path = __toESM(require_path(), 1);
 var import_url = __toESM(require_url(), 1);
 var { default: fs} = (() => ({}));
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/backends/onnx.js
+// node_modules/@davidcks/transformers/src/backends/onnx.js
 var ONNX_WEB = __toESM(require_ort_web_min(), 1);
 var ONNX_NODE = (() => ({}));
 var ONNX;
@@ -13545,7 +13545,7 @@ if (typeof process !== "undefined" && process?.release?.name === "node") {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/env.js
+// node_modules/@davidcks/transformers/src/env.js
 var isEmpty = function(obj) {
   return obj === undefined || obj === null || Object.keys(obj).length === 0;
 };
@@ -13582,7 +13582,7 @@ var env = {
   customCache: null
 };
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/hub.js
+// node_modules/@davidcks/transformers/src/utils/hub.js
 var isValidUrl = function(string, protocols = null, validHosts = null) {
   let url2;
   try {
@@ -13918,7 +13918,7 @@ class FileCache {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/maths.js
+// node_modules/@davidcks/transformers/src/utils/maths.js
 function interpolate_data(input, [in_channels, in_height, in_width], [out_height, out_width], mode = "bilinear", align_corners = false) {
   const x_scale = out_width / in_width;
   const y_scale = out_height / in_height;
@@ -14444,7 +14444,7 @@ class FFT {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/tensor.js
+// node_modules/@davidcks/transformers/src/utils/tensor.js
 var reshape = function(data, dimensions) {
   const totalElements = data.length;
   const dimensionSize = dimensions.reduce((a, b) => a * b);
@@ -15040,7 +15040,7 @@ class Tensor {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/data-structures.js
+// node_modules/@davidcks/transformers/src/utils/data-structures.js
 class PriorityQueue {
   constructor(comparator = (a, b) => a > b) {
     this._heap = [];
@@ -15256,7 +15256,7 @@ class TokenLatticeNode {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/node_modules/@huggingface/jinja/dist/index.js
+// node_modules/@huggingface/jinja/dist/index.js
 var isWord = function(char) {
   return /\w/.test(char);
 };
@@ -16684,7 +16684,7 @@ var Template = class {
   }
 };
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/tokenizers.js
+// node_modules/@davidcks/transformers/src/tokenizers.js
 async function loadTokenizer(pretrained_model_name_or_path, options) {
   const info = await Promise.all([
     getModelJSON(pretrained_model_name_or_path, "tokenizer.json", true, options),
@@ -19145,7 +19145,7 @@ class AutoTokenizer {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/configs.js
+// node_modules/@davidcks/transformers/src/configs.js
 async function loadConfig(pretrained_model_name_or_path, options) {
   let info = await getModelJSON(pretrained_model_name_or_path, "config.json", true, options);
   return info;
@@ -19181,7 +19181,7 @@ class AutoConfig {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/generation.js
+// node_modules/@davidcks/transformers/src/utils/generation.js
 class LogitsProcessorList extends Callable {
   constructor() {
     super();
@@ -19576,7 +19576,7 @@ class BeamSearchSampler extends Sampler {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/models.js
+// node_modules/@davidcks/transformers/src/models.js
 async function constructSession(pretrained_model_name_or_path, fileName, options) {
   let modelFileName = `onnx/${fileName}${options.quantized ? "_quantized" : ""}.onnx`;
   let buffer = await getModelFile(pretrained_model_name_or_path, modelFileName, true, options);
@@ -22442,7 +22442,7 @@ class VitsModelOutput extends ModelOutput {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/image.js
+// node_modules/@davidcks/transformers/src/utils/image.js
 var { default: sharp} = (() => ({}));
 var BROWSER_ENV = typeof self !== "undefined";
 var WEBWORKER_ENV = BROWSER_ENV && self.constructor.name === "DedicatedWorkerGlobalScope";
@@ -22879,7 +22879,7 @@ class RawImage {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/utils/audio.js
+// node_modules/@davidcks/transformers/src/utils/audio.js
 async function read_audio(url2, sampling_rate) {
   if (typeof AudioContext === "undefined") {
     throw Error("Unable to load audio from path/URL since `AudioContext` is not available in your environment. Instead, audio data should be passed directly to the pipeline/processor. For more information and some example code, see https://huggingface.co/docs/transformers.js/guides/node-audio-processing.");
@@ -23216,7 +23216,7 @@ var MEL_TO_HERTZ_MAPPING = {
   slaney: (mels, min_log_hertz = 1000, min_log_mel = 15, logstep = Math.log(6.4) / 27) => mels >= min_log_mel ? min_log_hertz * Math.exp(logstep * (mels - min_log_mel)) : 200 * mels / 3
 };
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/processors.js
+// node_modules/@davidcks/transformers/src/processors.js
 var center_to_corners_format = function([centerX, centerY, width, height]) {
   return [
     centerX - width / 2,
@@ -24391,7 +24391,7 @@ class AutoProcessor {
   }
 }
 
-// /home/odin/apps/three-vrm-audio/packages/3rd/transformers/src/pipelines.js
+// node_modules/@davidcks/transformers/src/pipelines.js
 async function prepareImages(images) {
   if (!Array.isArray(images)) {
     images = [images];
