@@ -33,10 +33,7 @@ async function phonemize(data, onnxruntimeBase, modelConfig) {
   const piperPhonemizeJs = URL.createObjectURL(await getBlob(data.piperPhonemizeJsUrl, blobs));
   const piperPhonemizeWasm = URL.createObjectURL(await getBlob(data.piperPhonemizeWasmUrl, blobs));
   const piperPhonemizeData = URL.createObjectURL(await getBlob(data.piperPhonemizeDataUrl, blobs));
-  const onnxruntimeJs = URL.createObjectURL(await getBlob(`${onnxruntimeBase}ort.min.js`, blobs));
-  importScripts(piperPhonemizeJs, onnxruntimeJs);
-  ort.env.wasm.numThreads = navigator.hardwareConcurrency;
-  ort.env.wasm.wasmPaths = onnxruntimeBase;
+  importScripts(piperPhonemizeJs);
   const phonemeIds = await new Promise(async (resolve) => {
     const module = await createPiperPhonemize({
       print: (data2) => {
@@ -79,6 +76,10 @@ async function init(data, phonemizeOnly = false) {
     self.postMessage({ kind: "complete" });
     return;
   }
+  const onnxruntimeJs = URL.createObjectURL(await getBlob(`${onnxruntimeBase}ort.min.js`, blobs));
+  importScripts(onnxruntimeJs);
+  ort.env.wasm.numThreads = navigator.hardwareConcurrency;
+  ort.env.wasm.wasmPaths = onnxruntimeBase;
   const sampleRate = modelConfig.audio.sample_rate;
   const numChannels = 1;
   const noiseScale = modelConfig.inference.noise_scale;
