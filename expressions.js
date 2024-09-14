@@ -118,7 +118,7 @@ class MouthExpression {
  * ```
  *
  */
-class FaceExpression {
+export class FaceExpression {
   /**
    * Creates a new FaceExpression.
    * @param {Object} params - The parameters for the mouth expression.
@@ -130,6 +130,7 @@ class FaceExpression {
    * @param {number} params.surprised - The "surprised" property of the expression.
    * @param {number} params.neutral - The "neutral" property of the expression.
    * @param {string} params.emotion - The emotion to express.
+   * @param {number} params.emotionScore - The score of the emotion, indicating confidence.
    *
    * All values default to 0 if not provided.
    *
@@ -144,6 +145,7 @@ class FaceExpression {
     surprised,
     neutral,
     emotion,
+    emotionScore,
   }) {
     this.duration = duration ?? 0;
     this.angry = angry ?? 0;
@@ -153,8 +155,17 @@ class FaceExpression {
     this.surprised = surprised ?? 0;
     this.neutral = neutral ?? 0;
     this.emotion = emotion ?? "";
+    this.emotionScore = emotionScore ?? 0;
   }
 
+  /**
+   *
+   * @param {Object} sentiment
+   * @param {number} sentiment.score
+   * @param {string} sentiment.label
+   * @param {number} duration
+   * @returns {FaceExpression}
+   */
   static fromDistilbertGoEmotions(sentiment, duration = -1) {
     const expression = new FaceExpression({ duration: duration });
     const labelAppliers = {
@@ -276,27 +287,28 @@ class FaceExpression {
       expression.neutral = sentiment.score;
     }
     expression.emotion = label;
+    expression.emotionScore = sentiment.score;
     return expression;
   }
 
-  static fromTwitterRobertaSentiment(sentiment, duration = -1) {
-    const expression = new FaceExpression({ duration: duration });
-    switch (sentiment.label.toLowerCase()) {
-      case "neutral":
-        expression.neutral = sentiment.score;
-        break;
-      case "positive":
-        expression.happy = sentiment.score;
-        break;
-      case "negative":
-        expression.sad = sentiment.score;
-        break;
-      default:
-        expression.neutral = 1;
-        break;
-    }
-    return expression;
-  }
+  // static fromTwitterRobertaSentiment(sentiment, duration = -1) {
+  //   const expression = new FaceExpression({ duration: duration });
+  //   switch (sentiment.label.toLowerCase()) {
+  //     case "neutral":
+  //       expression.neutral = sentiment.score;
+  //       break;
+  //     case "positive":
+  //       expression.happy = sentiment.score;
+  //       break;
+  //     case "negative":
+  //       expression.sad = sentiment.score;
+  //       break;
+  //     default:
+  //       expression.neutral = 1;
+  //       break;
+  //   }
+  //   return expression;
+  // }
 }
 
 /**
@@ -420,14 +432,16 @@ export class Expressions {
           const faceExpressions = [
             FaceExpression.fromDistilbertGoEmotions(output, duration),
           ];
+          onProgress && onProgress(100);
           resolve(faceExpressions);
           this.expressionWorker.removeEventListener("message", messageListener);
         } else if (data.status === "stderr") {
           reject(data);
           this.expressionWorker.removeEventListener("message", messageListener);
+        } else if (data.status === "progress") {
+          onProgress && onProgress(Math.round(data.progress * 100) * 0.01);
         } else {
           console.log(data);
-          onProgress(data);
         }
       };
       this.expressionWorker.addEventListener("message", messageListener);
