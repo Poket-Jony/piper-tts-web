@@ -1,6 +1,6 @@
 {
   "name": "piper-wasm",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Wasm Version of rhasspy/piper running locally in the browser",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,10 @@
     "espeak-ng/espeak-ng-data/voices",
     "index.js",
     "api.js",
-    "piper_worker.js"
+    "piper_worker.js",
+    "expression_worker.js",
+    "expressions.js",
+    "worker_blob_cache.js"
   ],
   "keywords": [
     "wasm",
