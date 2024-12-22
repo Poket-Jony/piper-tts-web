@@ -1,52 +1,45 @@
 {
-  "name": "piper-wasm",
-  "version": "0.1.4",
-  "description": "Wasm Version of rhasspy/piper running locally in the browser",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "bun run build-worker-expression && bun run build-worker-piper && bun run copy-transformers-dist && bun run copy-onnx-1_17_0-dist",
-    "build-worker-expression": "bun build expression_worker.js --outdir build/worker",
-    "build-worker-piper": "bun build piper_worker.js --outdir build/worker",
-    "copy-transformers-dist": "rm -rf build/worker/dist && mkdir -p build/worker/dist && cp -r node_modules/@xenova/transformers/dist/* build/worker/dist && cp -r node_modules/onnxruntime-web/dist/* build/worker/dist",
-    "copy-onnx-1_17_0-dist": "rm -rf build/worker/dist/piper-dist && mkdir -p build/worker/dist/piper-dist && cp -r node_modules/onnxruntime-web_1.17.0/dist/* build/worker/dist/piper-dist"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/DavidCks/piper-wasm.git"
-  },
-  "files": [
-    "build",
-    "espeak-ng/espeak-ng-data/lang",
-    "espeak-ng/espeak-ng-data/voices",
-    "index.js",
-    "api.js",
-    "piper_worker.js",
-    "expression_worker.js",
-    "expressions.js",
-    "worker_blob_cache.js"
-  ],
+  "name": "piper-tts-web",
+  "description": "Web version of rhasspy/piper running locally in the browser",
   "keywords": [
-    "wasm",
     "piper",
     "tts",
+    "web",
+    "wasm",
     "onnx"
   ],
-  "author": "DavidCks",
+  "version": "1.0.0",
+  "author": "Poket-Jony",
   "contributors": [
     {
-      "name": "Konstantin Paulus",
-      "url": "https://github.com/diffusion-studio"
+      "name": "Jonas Plamann",
+      "url": "https://github.com/Poket-Jony"
     }
   ],
   "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Poket-Jony/piper-tts-web.git"
+  },
   "bugs": {
-    "url": "https://github.com/DavidCks/piper-wasm/issues"
+    "url": "https://github.com/Poket-Jony/piper-tts-web/issues"
   },
-  "homepage": "https://davidcks.onrender.com/",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:phonemize": "docker run --rm -v ./build:/build $(docker build -q .)",
+    "preview": "vite preview",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.2.1",
+    "onnxruntime-web": "^1.20.1"
+  },
   "devDependencies": {
-    "onnxruntime-web_1.17.0": "npm:onnxruntime-web@1.17.0",
-    "@davidcks/transformers": "git+https://github.com/DavidCks/transformers.js.git#main"
-  },
-  "dependencies": {}
+    "prettier": "^3.4.2",
+    "vite": "^6.0.5",
+    "vite-plugin-commonjs": "^0.10.4",
+    "vite-plugin-static-copy": "^2.2.0"
+  }
 }

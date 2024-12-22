@@ -1,185 +1,133 @@
-# Piper Wasm
+# Piper-TTS-Web
+[![Latest Release](https://img.shields.io/github/release/Poket-Jony/piper-tts-web.svg?style=flat&color=blue)](https://github.com/Poket-Jony/piper-tts-web/releases/latest)
+[![GitHub stars](https://img.shields.io/github/stars/Poket-Jony/piper-tts-web?style=flat&color=brightgreen)](https://github.com/Poket-Jony/piper-tts-web/stargazers)
+[![Downloads](https://img.shields.io/npm/dt/piper-tts-web?color=brightgreen)](https://github.com/Poket-Jony/piper-tts-web/releases/latest)
+[![Open Issues](https://img.shields.io/github/issues-raw/Poket-Jony/piper-tts-web.svg?style=flat&color=yellowgreen)](https://github.com/Poket-Jony/piper-tts-web/issues?q=is%3Aopen+is%3Aissue)
+[![Closed Issues](https://img.shields.io/github/issues-closed-raw/Poket-Jony/piper-tts-web.svg?style=flat&color=brightgreen)](https://github.com/Poket-Jony/piper-tts-web/issues?q=is%3Aissue+is%3Aclosed)
 
-The files in `/build` were generated using the steps proposed by [wide-video / piper-wasm](https://github.com/wide-video/piper-wasm).
+> Web version of [rhasspy/piper](https://github.com/rhasspy/piper) running locally in the browser.
 
-## Usage
+## Features
+- Phoneme Generation
+- WAV Audio Output
+- Expression / Emotions Generation
 
-To use PiperTTS client-side in your project, copy the neccessary files into your public directory. If you're using Webpack and NextJS, you need to install the `copy-webpack-plugin` as a dev dependency and modify your config like this:
+## Roadmap
+- Web-Worker Support
+- Service-Worker Support
 
-```js
+## Install
+```shell
+npm install git+https://github.com/Poket-Jony/piper-tts-web.git
+```
+
+To use PiperTTS client-side in your project, copy the neccessary files into your public directory.
+
+If you're using Webpack, you need to install the [copy-webpack-plugin](https://www.npmjs.com/package/copy-webpack-plugin) and modify your config like this:
+```javascript
 const nextConfig = {
   webpack: (config) => {
     config.plugins.push(
       new CopyPlugin({
         patterns: [
           {
-            from: "node_modules/piper-wasm/build/piper_phonemize.wasm",
-            to: "../public/",
+            from: 'node_modules/onnxruntime-web/dist/*.wasm',
+            to: 'onnx'
           },
           {
-            from: "node_modules/piper-wasm/build/piper_phonemize.data",
-            to: "../public/",
+            from: 'build/piper_phonemize.wasm',
+            to: 'piper'
           },
           {
-            from: "node_modules/piper-wasm/build/piper_phonemize.js",
-            to: "../public/",
-          },
-          {
-            from: "node_modules/piper-wasm/build/worker/piper_worker.js",
-            to: "../public/",
-          },
-          {
-            from: "node_modules/piper-wasm/espeak-ng/espeak-ng-data/voices",
-            to: "../public/espeak-ng-data/voices",
-          },
-          {
-            from: "node_modules/piper-wasm/espeak-ng/espeak-ng-data/lang",
-            to: "../public/espeak-ng-data/lang",
-          },
-          // onnx runtime stuff
-          {
-            from: "node_modules/piper-wasm/build/worker/dist",
-            to: "../public/dist",
-          },
-          // only needed if you need to know the emotion of the speaker
-          {
-            from: "node_modules/piper-wasm/build/worker/expression_worker.js",
-            to: "../public/",
+            from: 'build/piper_phonemize.data',
+            to: 'piper'
           },
         ],
       })
     );
     return config;
   },
-  ...
 };
+```
+
+For Vite use [vite-plugin-static-copy](https://www.npmjs.com/package/vite-plugin-static-copy) and modify your config like this:
+```javascript
+export default defineConfig({
+  plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'node_modules/onnxruntime-web/dist/*.wasm',
+          dest: 'onnx'
+        },
+        {
+          src: 'build/piper_phonemize.wasm',
+          dest: 'piper'
+        },
+        {
+          src: 'build/piper_phonemize.data',
+          dest: 'piper'
+        },
+      ]
+    }),
+  ],
+});
 ```
 
 Other build tools may require different configurations, so check which one you're using and figure out how to copy files to your public directory if you don't know how to do it.
 
-Make sure that all files and directories listed share the same parent route:
+## Usage
+```javascript
+import { PiperEngine, OnnxWebGPURuntime } from 'piper-tts-web';
 
-```yml
-- some-route
-  - piper_phonemize.wasm
-  - piper_phonemize.data
-  - piper_phonemize.js
-  - piper_worker.js
-  - espeak-ng-data
-    - voices
-    - lang
-  - expression_worker.js  # optional
-  - dist
-    - {onnx-runtime-stuff}
+const voiceProvider = new HuggingFaceVoiceProvider();
+const engine = new PiperEngine({
+  onnxRuntime: new OnnxWebGPURuntime(),
+  voiceProvider,
+});
+
+const voices = await voiceProvider.list();
+console.log(voices);
+
+const text = 'This is a test!';
+const voice = 'en_US-libritts_r-medium';
+const speaker = 0;
+
+const response = await engine.generate(text, voice, speaker);
+console.log(response);
+
+const expressions = await engine.expressions(response.phonemeData);
+console.log(expressions);
 ```
 
-Then, you can import the `piperGenerate` function to generate audio. If you want to use the models hosted in the Rhasppy HuggingFace repository, you can also import `HF_BASE`, which is the base URL for the models, and append the model path. Here's an example of how to generate audio:
+Take also a look at the [example](./index.html) for more details.
 
-```js
-import { piperGenerate } from "piper-wasm";
-
-const data = await piperGenerate(
-  "piper_phonemize.js",
-  "piper_phonemize.wasm",
-  "piper_phonemize.data",
-  "piper_worker.js",
-  `${HF_BASE}en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx`,
-  `${HF_BASE}en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx.json`,
-  307,
-  text,
-  (progress) => { },
-  null,
-  false
-);
+## Development
+**Vite Dev Server:**
+```shell
+npm run dev
 ```
 
-`data` gives you the Blob URL of the generated audio, along with some other information. You can use this URL to play the audio in your application like so:
-
-```js
-const audio = new Audio(data.file);
-audio.play();
+**Vite Build Distribution:**
+```shell
+npm run build
 ```
 
-If you only need the phonemes, you can use the `piperPhonemize` function instead:
-
-```js
-const { phonemes, phonemeIds } = await piperPhonemize(
-  "piper_phonemize.js",
-  "piper_phonemize.wasm",
-  "piper_phonemize.data",
-  "piper_worker.js",
-  `${HF_BASE}en/en_US/libritts_r/medium/en_US-libritts_r-medium.onnx`,
-  text,
-  (progress) => {},
-);
+**Build Piper-Phonemize with Docker:**
+```shell
+npm run build:phonemize
 ```
 
-Read the JSDoc comments for the functions for more info.
+## Credits
+piper-tts-web:
+- Jonas Plamann [[@Poket-Jony](https://github.com/Poket-Jony)]
 
-## NextJS config
+piper-wasm:
+- Jozef Chutka [[@jozefchutka](https://github.com/jozefchutka)]
+- David Christ [[@DavidCks](https://github.com/DavidCks)]
 
-One opt-in feature of this package is emotion inference from audio. It uses the transformers.js library for that, which doesn't play nicely with NextJS out of the box.
-If you've gotten this far, you're probably seeing an error message like this:
+vits-web:
+- Konstantin Paulus [[@k9p5](https://github.com/k9p5)]
 
-```txt
-Module parse failed: Unexpected character '�' (1:0)
-You may need an appropriate loader to handle this file type, ...
-```
-
-To resolve this issue, you need to add a custom webpack configuration to your NextJS project. Here's how you can do it:
-
-```js
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-    // (Optional) Export as a static site
-    // See https://nextjs.org/docs/pages/building-your-application/deploying/static-exports#configuration
-    output: 'export', // Feel free to modify/remove this option
-
-    // Override the default webpack configuration
-    webpack: (config) => {
-        // See https://webpack.js.org/configuration/resolve/#resolvealias
-        config.resolve.alias = {
-            ...config.resolve.alias,
-            "sharp$": false,
-            "onnxruntime-node$": false,
-        }
-        return config;
-    },
-}
-```
-
-This config step is taken straight from the [transformers.js documentation](https://huggingface.co/docs/transformers.js/tutorials/next). If you're still having trouble or need more information, check out that documentation.
-
-**Piper Phonemize Build Steps As of JUN 2024:**
-
-```sh
-# Docker (optional)
-docker run -it -v $(pwd):/wasm -w /wasm debian:11.3
-apt-get update
-apt-get install --yes --no-install-recommends build-essential cmake ca-certificates curl pkg-config git python3 autogen automake autoconf libtool
-
-# Emscripten
-git clone --depth 1 https://github.com/emscripten-core/emsdk.git /wasm/modules/emsdk
-cd /wasm/modules/emsdk
-./emsdk install 3.1.47
-./emsdk activate 3.1.47
-source ./emsdk_env.sh
-TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
-sed -i -E 's/int\s+(iswalnum|iswalpha|iswblank|iswcntrl|iswgraph|iswlower|iswprint|iswpunct|iswspace|iswupper|iswxdigit)\(wint_t\)/\/\/\0/g' ./upstream/emscripten/cache/sysroot/include/wchar.h
-
-# espeak-ng
-git clone --depth 1 https://github.com/rhasspy/espeak-ng.git /wasm/modules/espeak-ng
-cd /wasm/modules/espeak-ng
-./autogen.sh
-./configure
-make
-
-# piper-phonemize
-git clone --depth 1 https://github.com/wide-video/piper-phonemize.git /wasm/modules/piper-phonemize
-cd /wasm/modules/piper-phonemize
-emmake cmake -Bbuild -DCMAKE_INSTALL_PREFIX=install -DCMAKE_TOOLCHAIN_FILE=$TOOLCHAIN_FILE -DBUILD_TESTING=OFF -G "Unix Makefiles" -DCMAKE_CXX_FLAGS="-O3 -s INVOKE_RUN=0 -s MODULARIZE=1 -s EXPORT_NAME='createPiperPhonemize' -s EXPORTED_FUNCTIONS='[_main]' -s EXPORTED_RUNTIME_METHODS='[callMain, FS]' --preload-file /wasm/modules/espeak-ng/espeak-ng-data@/espeak-ng-data"
-emmake cmake --build build --config Release # fails on "Compile intonations / Permission denied", continue with next steps
-sed -i 's+$(MAKE) $(MAKESILENT) -f CMakeFiles/data.dir/build.make CMakeFiles/data.dir/build+#\0+g' /wasm/modules/piper-phonemize/build/e/src/espeak_ng_external-build/CMakeFiles/Makefile2
-sed -i 's/using namespace std/\/\/\0/g' /wasm/modules/piper-phonemize/build/e/src/espeak_ng_external/src/speechPlayer/src/speechWaveGenerator.cpp
-emmake cmake --build build --config Release
-```
+## License
+MIT

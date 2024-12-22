@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Piper-TTS-Web</title>
+</head>
+<body>
+<div style="display: flex; flex-direction: column; align-items: center;">
+    <h1>Piper-TTS-Web Example</h1>
+    <textarea id="text" rows="10" style="flex: 1 0; margin: 1rem; width: 800px;">This is a test!</textarea>
+    <select id="voice" style="flex: 1 0; margin: 1rem; width: 300px;"></select>
+    <input id="speaker" type="number" min="0" value="0" style="flex: 1 0; margin: 1rem; width: 300px;" />
+    <button id="generate" style="flex: 1 0; margin: 1rem; width: 300px;">Generate</button>
+    <div id="result" style="flex: 1 0; margin: 1rem;"></div>
+</div>
+
+<script type="module">
+    import { PiperEngine, OnnxWebGPURuntime, HuggingFaceVoiceProvider } from './src/index.js';
+
+    const voiceProvider = new HuggingFaceVoiceProvider();
+    const engine = new PiperEngine({
+      onnxRuntime: new OnnxWebGPURuntime(),
+      voiceProvider,
+    });
+
+    const voices = await voiceProvider.list();
+    console.log(voices);
+
+    for (const voice of Object.keys(voices)) {
+      const option = document.createElement('option');
+      option.value = voice;
+      option.text = voice;
+      if (voice === 'en_US-libritts_r-medium') {
+        option.selected = true;
+      }
+      document.getElementById('voice').appendChild(option);
+    }
+
+    document.getElementById('voice').addEventListener('change', (event) => {
+      document.getElementById('speaker').value = 0;
+      document.getElementById('speaker').max = voices[event.target.value].num_speakers - 1;
+    });
+
+    let audio = null;
+    document.getElementById('generate').addEventListener('click', async () => {
+      if (audio) {
+        document.getElementById('result').removeChild(audio);
+      }
+
+      const response = await engine.generate(
+        document.getElementById('text').value,
+        document.getElementById('voice').value,
+        document.getElementById('speaker').value
+      );
+      console.log(response);
+
+      const expressions = await engine.expressions(response.phonemeData);
+      console.log(expressions);
+
+      const source = document.createElement('source');
+      source.type = response.file.type;
+      source.src = URL.createObjectURL(response.file);
+      audio = document.createElement('audio');
+      audio.controls = true;
+      audio.autoplay = true;
+      audio.appendChild(source);
+      document.getElementById('result').appendChild(audio);
+    });
+</script>
+</body>
+</html>
