@@ -11,10 +11,7 @@
 - Phoneme Generation
 - WAV Audio Output
 - Expression / Emotions Generation
-
-## Roadmap
-- Web-Worker Support
-- Service-Worker Support
+- WebWorker Support
 
 ## Install
 ```shell
@@ -38,6 +35,10 @@ const nextConfig = {
             from: 'node_modules/piper-tts-web/dist/piper',
             to: '../public/'
           },
+          {
+            src: 'node_modules/piper-tts-web/dist/worker',
+            dest: '../public/'
+          },
         ],
       })
     );
@@ -60,6 +61,10 @@ export default defineConfig({
           src: 'node_modules/piper-tts-web/dist/piper',
           dest: '.'
         },
+        {
+          src: 'node_modules/piper-tts-web/dist/worker',
+          dest: '.'
+        },
       ]
     }),
   ],
@@ -69,17 +74,54 @@ export default defineConfig({
 Other build tools may require different configurations, so check which one you're using and figure out how to copy files to your public directory if you don't know how to do it.
 
 ## Usage
+**Basic:**
 ```javascript
-import { PiperEngine, OnnxWebGPURuntime } from 'piper-tts-web';
+import { PiperWebEngine } from 'piper-tts-web';
 
-const voiceProvider = new HuggingFaceVoiceProvider();
-const engine = new PiperEngine({
+const engine = new PiperWebEngine();
+
+const text = 'This is a test!';
+const voice = 'en_US-libritts_r-medium';
+const speaker = 0;
+
+const response = await engine.generate(text, voice, speaker);
+console.log(response);
+
+const expressions = await engine.expressions(response.phonemeData);
+console.log(expressions);
+```
+
+**Basic with WebGPU:**
+```javascript
+import { PiperWebEngine, OnnxWebGPURuntime } from 'piper-tts-web';
+
+const engine = new PiperWebEngine({
   onnxRuntime: new OnnxWebGPURuntime(),
-  voiceProvider,
 });
 
+const text = 'This is a test!';
+const voice = 'en_US-libritts_r-medium';
+const speaker = 0;
+
+const response = await engine.generate(text, voice, speaker);
+console.log(response);
+
+const expressions = await engine.expressions(response.phonemeData);
+console.log(expressions);
+```
+
+**Advanced with WebWorker, WebGPU and VoiceProvider:**
+```javascript
+import { PiperWebWorkerEngine, OnnxWebGPUWorkerRuntime, HuggingFaceVoiceProvider } from 'piper-tts-web';
+
+const voiceProvider = new HuggingFaceVoiceProvider();
 const voices = await voiceProvider.list();
 console.log(voices);
+
+const engine = new PiperWebWorkerEngine({
+  onnxRuntime: new OnnxWebGPUWorkerRuntime(),
+  voiceProvider,
+});
 
 const text = 'This is a test!';
 const voice = 'en_US-libritts_r-medium';

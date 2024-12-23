@@ -1,8 +1,13 @@
-export { default as PiperEngine } from './Engine/PiperEngine.js';
+export { default as PiperWebEngine } from './Engine/PiperWebEngine.js';
+export { default as PiperWebWorkerEngine } from './Engine/PiperWebWorkerEngine.js';
 export { default as OnnxWebRuntime } from './Runtime/Onnx/OnnxWebRuntime.js';
+export { default as OnnxWebWorkerRuntime } from './Runtime/Onnx/OnnxWebWorkerRuntime.js';
 export { default as OnnxWebGPURuntime } from './Runtime/Onnx/OnnxWebGPURuntime.js';
+export { default as OnnxWebGPUWorkerRuntime } from './Runtime/Onnx/OnnxWebGPUWorkerRuntime.js';
 export { default as PhonemizeWebRuntime } from './Runtime/Phonemize/PhonemizeWebRuntime.js';
+export { default as PhonemizeWebWorkerRuntime } from './Runtime/Phonemize/PhonemizeWebWorkerRuntime.js';
 export { default as ExpressionWebRuntime } from './Runtime/Expression/ExpressionWebRuntime.js';
+export { default as ExpressionWebWorkerRuntime } from './Runtime/Expression/ExpressionWebWorkerRuntime.js';
 export { default as RemoteVoiceProvider } from './Provider/Voice/RemoteVoiceProvider.js';
 export { default as HuggingFaceVoiceProvider } from './Provider/Voice/HuggingFaceVoiceProvider.js';
 export { default as FetchProvider } from './Provider/FetchProvider.js';

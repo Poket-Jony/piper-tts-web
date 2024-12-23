@@ -15,16 +15,16 @@
 </div>
 
 <script type="module">
-    import { PiperEngine, OnnxWebGPURuntime, HuggingFaceVoiceProvider } from './src/index.js';
+    import { PiperWebWorkerEngine, OnnxWebGPUWorkerRuntime, HuggingFaceVoiceProvider } from './src/index.js';
 
     const voiceProvider = new HuggingFaceVoiceProvider();
-    const engine = new PiperEngine({
-      onnxRuntime: new OnnxWebGPURuntime(),
-      voiceProvider,
-    });
-
     const voices = await voiceProvider.list();
     console.log(voices);
+
+    const engine = new PiperWebWorkerEngine({
+      onnxRuntime: new OnnxWebGPUWorkerRuntime(),
+      voiceProvider,
+    });
 
     for (const voice of Object.keys(voices)) {
       const option = document.createElement('option');

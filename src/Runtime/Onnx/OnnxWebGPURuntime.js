@@ -1,14 +1,8 @@
-import * as ort from 'onnxruntime-web/webgpu';
-import AbstractOnnxRuntime from './AbstractOnnxRuntime.js';
+import * as Ort from 'onnxruntime-web/webgpu';
+import OnnxWebRuntime from './OnnxWebRuntime.js';
 
-export default class extends AbstractOnnxRuntime {
-  get ort() {
-    return ort;
-  }
-
-  constructor({ basePath = '/onnx/', numThreads = navigator.hardwareConcurrency } = {}) {
-    super();
-    ort.env.wasm.wasmPaths = basePath;
-    ort.env.wasm.numThreads = numThreads;
+export default class extends OnnxWebRuntime {
+  constructor({ ort = Ort, basePath = '/onnx/', numThreads = navigator.hardwareConcurrency } = {}) {
+    super({ ort, basePath, numThreads });
   }
 }

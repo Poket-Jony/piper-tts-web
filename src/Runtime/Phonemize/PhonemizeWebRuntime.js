@@ -4,6 +4,8 @@ import FetchProvider from '../../Provider/FetchProvider.js';
 export default class {
   #provider = null;
   #basePath = null;
+  #wasmUrl = null;
+  #dataUrl = null;
   #module = null;
   #callback = null;
 
@@ -14,13 +16,17 @@ export default class {
 
   destroy() {
     this.#provider.destroy();
+    this.#wasmUrl = null;
+    this.#dataUrl = null;
+    this.#module = null;
+    this.#callback = null;
   }
 
-  async loadModule() {
-    if (!this.#module) {
-      const wasmUrl = await this.#provider.fetch(this.#basePath + 'piper_phonemize.wasm');
-      const dataUrl = await this.#provider.fetch(this.#basePath + 'piper_phonemize.data');
+  async loadModule(wasmUrl = null, dataUrl = null) {
+    this.#wasmUrl = wasmUrl || this.#wasmUrl || (await this.#provider.fetch(this.#basePath + 'piper_phonemize.wasm'));
+    this.#dataUrl = dataUrl || this.#dataUrl || (await this.#provider.fetch(this.#basePath + 'piper_phonemize.data'));
 
+    if (!this.#module) {
       this.#module = await createPiperPhonemize({
         print: (data) => {
           if (this.#callback) {
@@ -33,19 +39,20 @@ export default class {
         },
         locateFile: (url, _scriptDirectory) => {
           if (url.endsWith('.wasm')) {
-            return wasmUrl;
+            return this.#wasmUrl;
           } else if (url.endsWith('.data')) {
-            return dataUrl;
+            return this.#dataUrl;
           }
           return url;
         },
       });
     }
+    return Promise.resolve(this.#module);
   }
 
   async phonemize(text, voiceData) {
-    const phonemeMap = this.#getPhonemeMap(voiceData);
-    return new Promise(async (resolve) => {
+    const phonemeMap = Object.fromEntries(Object.entries(voiceData[0].phoneme_id_map).map(([k, v]) => [v[0], k]));
+    return new Promise((resolve) => {
       this.#callback = (data) => {
         const phonemes = data.phoneme_ids.map((id) => phonemeMap[id]);
         resolve({
@@ -54,18 +61,16 @@ export default class {
         });
       };
 
-      this.#module.callMain([
-        '-l',
-        voiceData[0].espeak.voice,
-        '--input',
-        JSON.stringify([{ text }]),
-        '--espeak_data',
-        '/espeak-ng-data',
-      ]);
+      this.loadModule().then((module) =>
+        module.callMain([
+          '-l',
+          voiceData[0].espeak.voice,
+          '--input',
+          JSON.stringify([{ text }]),
+          '--espeak_data',
+          '/espeak-ng-data',
+        ])
+      );
     });
-  }
-
-  #getPhonemeMap(voiceData) {
-    return Object.fromEntries(Object.entries(voiceData[0].phoneme_id_map).map(([k, v]) => [v[0], k]));
   }
 }
