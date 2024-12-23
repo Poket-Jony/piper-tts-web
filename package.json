@@ -18,6 +18,7 @@
   ],
   "license": "MIT",
   "type": "module",
+  "main": "dist/piper-tts-web.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Poket-Jony/piper-tts-web.git"

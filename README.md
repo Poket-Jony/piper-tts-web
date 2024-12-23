@@ -31,16 +31,12 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
-            from: 'node_modules/onnxruntime-web/dist/*.wasm',
-            to: 'onnx'
+            from: 'node_modules/piper-tts-web/dist/onnx',
+            to: '../public/'
           },
           {
-            from: 'build/piper_phonemize.wasm',
-            to: 'piper'
-          },
-          {
-            from: 'build/piper_phonemize.data',
-            to: 'piper'
+            from: 'node_modules/piper-tts-web/dist/piper',
+            to: '../public/'
           },
         ],
       })
@@ -57,16 +53,12 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: 'node_modules/onnxruntime-web/dist/*.wasm',
-          dest: 'onnx'
+          src: 'node_modules/piper-tts-web/dist/onnx',
+          dest: '.'
         },
         {
-          src: 'build/piper_phonemize.wasm',
-          dest: 'piper'
-        },
-        {
-          src: 'build/piper_phonemize.data',
-          dest: 'piper'
+          src: 'node_modules/piper-tts-web/dist/piper',
+          dest: '.'
         },
       ]
     }),
