@@ -1,28 +1,25 @@
 import createPiperPhonemize from '../../../build/piper_phonemize.js';
+import FetchProvider from '../../Provider/FetchProvider.js';
 
 export default class {
+  #provider = null;
   #basePath = null;
   #module = null;
   #callback = null;
-  #cache = [];
 
-  constructor({ basePath = '/piper/' } = {}) {
+  constructor({ provider = new FetchProvider(), basePath = '/piper/' } = {}) {
+    this.#provider = provider;
     this.#basePath = basePath;
   }
 
   destroy() {
-    for (const data in this.#cache) {
-      if (typeof data === 'string' && data.startsWith('blob:')) {
-        URL.revokeObjectURL(data);
-      }
-    }
-    this.#cache = [];
+    this.#provider.destroy();
   }
 
   async loadModule() {
     if (!this.#module) {
-      const wasmUrl = await this.#fetch(this.#basePath + 'piper_phonemize.wasm');
-      const dataUrl = await this.#fetch(this.#basePath + 'piper_phonemize.data');
+      const wasmUrl = await this.#provider.fetch(this.#basePath + 'piper_phonemize.wasm');
+      const dataUrl = await this.#provider.fetch(this.#basePath + 'piper_phonemize.data');
 
       this.#module = await createPiperPhonemize({
         print: (data) => {
@@ -46,14 +43,11 @@ export default class {
     }
   }
 
-  async phonemize(text, voice) {
+  async phonemize(text, voiceData) {
+    const phonemeMap = this.#getPhonemeMap(voiceData);
     return new Promise(async (resolve) => {
-      const config = await fetch(voice[0]).then((response) => response.json());
-
       this.#callback = (data) => {
-        const phonemeMap = Object.fromEntries(Object.entries(config.phoneme_id_map).map(([k, v]) => [v[0], k]));
         const phonemes = data.phoneme_ids.map((id) => phonemeMap[id]);
-
         resolve({
           ...data,
           phonemes,
@@ -62,7 +56,7 @@ export default class {
 
       this.#module.callMain([
         '-l',
-        config.espeak.voice,
+        voiceData[0].espeak.voice,
         '--input',
         JSON.stringify([{ text }]),
         '--espeak_data',
@@ -71,17 +65,7 @@ export default class {
     });
   }
 
-  async #fetch(url) {
-    return !this.#cache[url]
-      ? fetch(url)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error('Could not fetch piper: ' + url);
-            }
-            return response.blob();
-          })
-          .then((data) => URL.createObjectURL(data))
-          .then((data) => (this.#cache[url] = data))
-      : Promise.resolve(this.#cache[url]);
+  #getPhonemeMap(voiceData) {
+    return Object.fromEntries(Object.entries(voiceData[0].phoneme_id_map).map(([k, v]) => [v[0], k]));
   }
 }

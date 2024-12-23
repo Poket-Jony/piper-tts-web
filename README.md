@@ -18,7 +18,7 @@
 
 ## Install
 ```shell
-npm install git+https://github.com/Poket-Jony/piper-tts-web.git
+npm install piper-tts-web
 ```
 
 To use PiperTTS client-side in your project, copy the neccessary files into your public directory.

@@ -9,11 +9,9 @@ export default class {
     this.#sessions = [];
   }
 
-  async generate(phonemeData, voice, speaker = 0) {
-    const config = await fetch(voice[0]).then((response) => response.json());
-
-    const session =
-      this.#sessions[voice[1]] || (this.#sessions[voice[1]] = await this.ort.InferenceSession.create(voice[1]));
+  async generate(phonemeData, voiceData, speaker = 0) {
+    const [config, voice] = voiceData;
+    const session = this.#sessions[voice] || (this.#sessions[voice] = await this.ort.InferenceSession.create(voice));
 
     const feeds = {
       input: new this.ort.Tensor('int64', phonemeData.phoneme_ids, [1, phonemeData.phoneme_ids.length]),
