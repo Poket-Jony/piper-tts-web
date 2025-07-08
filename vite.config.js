@@ -42,6 +42,7 @@ export default defineConfig({
   },
   build: {
     lib: {
+      formats: ['es'],
       entry: 'src/index.js',
       name: 'piper-tts-web',
     },
