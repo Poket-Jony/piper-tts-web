@@ -80,7 +80,7 @@ export default class {
       duration: this.#characterDuration,
       aa: 0,
       ee: 1,
-      ih: 57,
+      ih: 0.57,
       oh: 0,
       ou: 0,
     }),
@@ -839,7 +839,7 @@ export default class {
     this.#ipa = this.#normalize(phonemes.join(' '));
   }
 
-  generateMouthExpressions(duration) {
+  generateMouthExpressions(duration = 1000, startOffset = 0, endOffset = 0) {
     const mouthExpressions = [];
     let calculatedDuration = 0;
     for (let i = 0; i < this.#ipa.length; i++) {
@@ -855,6 +855,16 @@ export default class {
     for (let i = 0; i < mouthExpressions.length; i++) {
       mouthExpressions[i].duration = mouthExpressions[i].duration * durationCorrectionMultiplier;
     }
+    mouthExpressions.unshift(new MouthExpression({ duration: startOffset }));
+    mouthExpressions.push(new MouthExpression({
+      duration: endOffset,
+      aa: 0.01,
+      ee: 0.01,
+      ih: 0.01,
+      oh: 0.01,
+      ou: 0.01,
+    }));
+
     return mouthExpressions;
   }
 

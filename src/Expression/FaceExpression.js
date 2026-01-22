@@ -101,7 +101,7 @@ export default class {
       },
       grief: (expression) => {
         expression.sad = score;
-        expression.anger = score * 0.5;
+        expression.angry = score * 0.5;
       },
       joy: (expression) => {
         expression.happy = score;

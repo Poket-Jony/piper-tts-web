@@ -53,16 +53,16 @@ export default class {
     return response;
   }
 
-  async expressions(phonemeData, duration = 1000) {
+  async expressions(phonemeData, duration = 1000, startOffset = 0, endOffset = 0) {
     if (this.#state.type !== IdleState.prototype.type) {
       return new Promise((resolve) =>
-        setTimeout(async () => resolve(await this.expressions(phonemeData, duration)), 100)
+        setTimeout(async () => resolve(await this.expressions(phonemeData, duration, startOffset, endOffset)), 100)
       );
     }
 
     duration = Number(duration);
     this.#state = new BusyState();
-    const mouth = new IPA(phonemeData.phonemes).generateMouthExpressions(duration);
+    const mouth = new IPA(phonemeData.phonemes).generateMouthExpressions(duration, startOffset, endOffset);
     const face = [
       await this.#expressionRuntime
         .generate(phonemeData.text)

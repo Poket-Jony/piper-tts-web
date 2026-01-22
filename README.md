@@ -158,7 +158,7 @@ piper-tts-web:
 
 piper-wasm:
 - Jozef Chutka [[@jozefchutka](https://github.com/jozefchutka)]
-- David Christ [[@DavidCks](https://github.com/DavidCks)]
+- David Christ [[@DavidCks](https://gitlab.com/DavidCks1)]
 
 vits-web:
 - Konstantin Paulus [[@k9p5](https://github.com/k9p5)]
